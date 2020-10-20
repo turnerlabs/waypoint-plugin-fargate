@@ -1,0 +1,10 @@
+
+syntax = "proto3";
+
+package registry;
+
+option go_package = "github.com/turnerlabs/waypoint-plugin-fargate/registry";
+
+message Artifact {
+  string source = 1;
+}
