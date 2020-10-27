@@ -1,31 +1,54 @@
-# Waypoint Plugin Template
+# waypoint-plugin-fargate
 
-This folder contains an example plugin structure which can be used when building your own plugins.
+A [waypoint](https://www.waypointproject.io/) plugin that deploys [AWS ECS/Fargate](https://aws.amazon.com/fargate/) applications.
 
-## Steps
+This plugin is similar to the built-in [aws-ecs](https://www.waypointproject.io/plugins/aws-ecs) plugin, however it does not create or provision any cloud infrastructure resources.  The plugin assumes that you already have an existing ECS service and simply deploys your application container on top of the infrastructure.
 
-1. To scaffold a new plugin use the `./clone.sh` script passing the destination folder and the Go package
-for your new plugin as parameters
+The plugin is optimized to work well with the [fargate-create](https://github.com/turnerlabs/fargate-create/) tool which uses [Terraform](https://github.com/turnerlabs/terraform-ecs-fargate) to provision the AWS cloud infrastructure.
 
-```shell
-./clone.sh ../destination_folder github.com/myorg/mypackage
+The great thing about `waypoint` is that it enables simple, declarative, and portable build/push/deploy flows that run the same on your laptop as they do in any of your CI/CD pipelines.
+
+
+### usage example
+
+The following example will build your application container (assuming you have a `Dockerfile`), push it to AWS ECR, register a new task definition which references the newly build image, and finally update the service to run the new task definition.
+
+`waypoint.hcl`
+
+```hcl
+project = "waypoint-test"
+
+app "waypoint-test" {
+
+  build {
+    use "docker" {}
+
+    registry {
+      use "aws-ecr" {
+        region     = "us-east-1"
+        repository = "waypoint-test"
+        tag        = gitrefpretty()
+      }
+    }
+  }
+
+  deploy {
+    use "fargate" {
+      cluster = "waypoint-test-dev"
+      service = "waypoint-test-dev"
+    }
+  }
+}
 ```
 
-2. You can then run the Makefile to compile the new plugin
-
-```shell
-cd ../destination_folder
-
-make
+```
+waypoint up
 ```
 
-```shell
-Build Protos
-protoc -I . --go_out=plugins=grpc:. --go_opt=paths=source_relative ./builder/output.proto
-protoc -I . --go_out=plugins=grpc:. --go_opt=paths=source_relative ./registry/output.proto
-protoc -I . --go_out=plugins=grpc:. --go_opt=paths=source_relative ./platform/output.proto
-protoc -I . --go_out=plugins=grpc:. --go_opt=paths=source_relative ./release/output.proto
 
-Compile Plugin
-go build -o ./bin/waypoint-plugin-template ./main.go
+### build from source
+
+```
+make build
+make install
 ```

@@ -1,11 +1,8 @@
 package main
 
 import (
-	"github.com/turnerlabs/waypoint-plugin-fargate/builder"
-	"github.com/turnerlabs/waypoint-plugin-fargate/platform"
-	"github.com/turnerlabs/waypoint-plugin-fargate/registry"
-	"github.com/turnerlabs/waypoint-plugin-fargate/release"
 	sdk "github.com/hashicorp/waypoint-plugin-sdk"
+	"github.com/turnerlabs/waypoint-plugin-fargate/platform"
 )
 
 func main() {
@@ -16,9 +13,9 @@ func main() {
 	sdk.Main(sdk.WithComponents(
 		// Comment out any components which are not
 		// required for your plugin
-		&builder.Builder{},
-		&registry.Registry{},
+		// &builder.Builder{},
+		// &registry.Registry{},
 		&platform.Platform{},
-		&release.ReleaseManager{},
+		// &release.ReleaseManager{},
 	))
 }
