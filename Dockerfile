@@ -1,7 +1,7 @@
 FROM golang:1.15.3-alpine3.12 as build
 
 # Install the Protocol Buffers compiler and Go plugin
-RUN apk add protobuf git make zip
+RUN apk add protobuf git make zip build-base
 RUN go get github.com/golang/protobuf/protoc-gen-go \
     google.golang.org/grpc/cmd/protoc-gen-go-grpc
 
