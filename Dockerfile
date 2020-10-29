@@ -1,24 +1,20 @@
-FROM golang:1.15.3-alpine3.12 as build
+FROM golang:1.15.3 as build
 
 # Install the Protocol Buffers compiler and Go plugin
-RUN apk add protobuf git make zip build-base
-RUN go get github.com/golang/protobuf/protoc-gen-go \
+RUN apt-get update && apt-get install -y zip
+RUN go get \
+    github.com/golang/protobuf/protoc-gen-go \
     google.golang.org/grpc/cmd/protoc-gen-go-grpc
 
 # Create the source folder
-RUN mkdir /go/plugin
 WORKDIR /go/plugin
 
 # Copy the source to the build folder
-COPY . /go/plugin
+COPY . .
 
-# Build the plugin
-RUN chmod +x ./print_arch
+# Build and zip the plugin
 RUN make all
 
-# Create the zipped binaries
-RUN make zip
-
-FROM scratch as export_stage
+FROM scratch as export
 
 COPY --from=build /go/plugin/bin/*.zip .
